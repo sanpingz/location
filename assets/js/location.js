@@ -26,35 +26,34 @@ var cz_location = {
         var rest = 'http://135.252.143.226:8080/ParlayREST/1.0/location/queries/location';
         var $addr = $("#cz_addr");
         var $search = $("#cz_search");
-        var data = {
+        /*var data = {
             acceptableAccuracy: 1000,
             maximumAge: 180,
             requestedAccuracy: 1000,
             responseTime: 300,
             tolerance: 'LowDelay'
-        }
+        }*/
         $search.click(function(){
             if ($addr.val()!=''){
-                data.address = $addr.val();
-                data.rest = rest;
                 var url = '/cgi-bin/get.cgi'
-                $.get(url, data, function(data){
+                $.get(url, { address: $addr.val() }, function(data){
                     alert(data);
                     if(data){
-                        var $curr = $(data).find('currentLocation');
-                        var latitude = $curr.children('latitude').first().text();
-                        var longitude = $curr.children('longitude').first().text();
-                        alert('latitude: '+latitude+', longitude: :'+longitude);
+                        var latitude = data.latitude;
+                        var longitude = data.longitude;
+                        alert('latitude: '+latitude+', longitude: '+longitude);
                     }else{
                         alert('Ops, server no response, please try later!');
                     }
                 });
+
                 /*$.ajax({
                     url: rest,
                     data: data,
+                    type: 'POST',
                     dataType: 'script',
                     success: function(data){
-                        if(data.length>10){
+                        *//*if(data.length>10){
                             alert('hello');
                             var $curr = $(data).find('currentLocation');
                             var latitude = $curr.children('latitude').first().text();
@@ -62,12 +61,14 @@ var cz_location = {
                             alert('latitude: '+latitude+', longitude: :'+longitude);
                         }else{
                             alert('Ops, server no response, please try later!');
-                        }
+                        }*//*
+                        alert(data);
                     },
                     error: function(data){
                         alert(data.getAllResponseHeaders());
                     }
                 });*/
+
                 /*$.get(rest, data, function(data){
                     alert(data);
                     if(data){
