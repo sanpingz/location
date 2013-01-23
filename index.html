@@ -11,9 +11,11 @@
     <!-- Le styles -->
     <link href="assets/css/bootstrap.min.css" rel="stylesheet">
     <style type="text/css">
-      html, body { height: 100%; width: 100% }
-      #map_canvas { height: 100%; width: 100% }
-      body { padding-top: 40px; padding-bottom: 40px; }
+      html { height: 100%; width: 100%; }
+      #map_canvas { height: 96%; width: 100% }
+      body { padding-top:40px; height: 93%;width: 100% }
+      #msg_box { z-index: 10001; position: fixed; text-align: center; top: 40%; width: 95%; display:none; }
+      footer { margin-left: 10px; }
     </style>
     <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet">
 
@@ -23,16 +25,6 @@
 
     <!-- Fav and touch icons -->
     <link rel="shortcut icon" href="assets/img/favicon.ico">
-    <script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=true">
-    </script>
-    <script src="assets/js/jquery.js"></script>
-    <script type="text/javascript" src="assets/js/location.js"></script>
-    <script type="text/javascript">
-        window.onload = function(){
-            //cz_location.resize();
-            cz_location.init();
-        }
-    </script>
   </head>
   <body>
     <div class="navbar navbar-inverse navbar-fixed-top">
@@ -42,7 +34,7 @@
           <div class="nav-collapse collapse">
             <form class="navbar-form pull-right">
               <input id="cz_addr" class="span2" type="text" name="address" value="" style="width: 200px">
-              <button id="cz_search" type="button" class="btn">Search</button>
+              <button id="cz_search" type="button" class="btn" data-loading-text="Searching...">Search</button>
             </form>
           </div><!--/.nav-collapse -->
         </div>
@@ -53,12 +45,22 @@
 
     </div> <!-- /container -->
 
+    <div class="alert alert-info" id="msg_box">
+        <button type="button" class="close" id="bt_times">&times;</button>
+        <strong></strong>
+    </div>
+
     <footer>
         <p>&copy; Alcatel-Lucent 2012</p>
     </footer>
 
+    <script type="text/javascript" src="https://maps.google.com/maps/api/js?sensor=true"></script>
+    <script type="text/javascript" src="assets/js/jquery.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/js/location.js"></script>
     <script type="text/javascript">
         $(function(){
+            cz_location.init();
             cz_location.get();
         });
     </script>
