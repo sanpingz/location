@@ -5,6 +5,7 @@
  */
 var cz_location = {
     Gmap: null,
+    Gmark: null,
     init: function(){
         //cz_location.locate(36.0757117,120.4128609,'Alcatel-lucent');
         //cz_location.geoLocate();
@@ -24,6 +25,7 @@ var cz_location = {
         $("#bt_times").click(function(){
             $(this).parent('div').hide();
         });
+        $("#cz_search").button('reset');
     },
     mark: function(latlng, map, title){
         var marker = new google.maps.Marker({
@@ -31,6 +33,22 @@ var cz_location = {
             map: map,
             title: title
         });
+        cz_location.Gmark = marker;
+    },
+    line: function(prev, curr){
+        if(prev.latitude!=0 && prev.longitude!=0){
+            var coordinates = [
+                new google.maps.LatLng(prev.latitude, prev.longitude),
+                new google.maps.LatLng(curr.latitude, curr.longitude)
+            ];
+            var flightPath = new google.maps.Polyline({
+                path: coordinates,
+                strokeColor: "#FF0000",
+                strokeOpacity: 1.0,
+                strokeWeight: 2
+            });
+            flightPath.setMap(cz_location.Gmap);
+        }
     },
     msg: function(text){
         var $msg = $("#msg_box");
@@ -42,14 +60,18 @@ var cz_location = {
         try{
             var latlng = new google.maps.LatLng(latitude, longitude);
             var myOptions = {
-                zoom: 12,
+                zoom: 11,
                 center: latlng,
                 mapTypeId: google.maps.MapTypeId.ROADMAP
             };
             //map.setCenter(latlng);
             map.setOptions(myOptions);
             //var map = new google.maps.Map(document.getElementById("map_canvas"), myOptions);
-            cz_location.mark(latlng, map, 'Mobile location');
+            if(!cz_location.Gmark){
+                cz_location.mark(latlng, map, 'Mobile location');
+            }else{
+                cz_location.Gmark.setPosition(latlng);
+            }
         }catch (err){
             cz_location.msg('Google map loads failed');
         }
@@ -57,6 +79,7 @@ var cz_location = {
     get: function(){
         var $addr = $("#cz_addr");
         var $search = $("#cz_search");
+        var addr_change = false;
         //var rest = 'http://135.252.143.226:8080/ParlayREST/1.0/location/queries/location';
         /*var data = {
             acceptableAccuracy: 1000,
@@ -81,6 +104,11 @@ var cz_location = {
         $search.click(function(){
             $("#cz_search").button('loading');
             $("#msg_box").hide();
+            var $trace = $("#cb_trace").attr('checked');
+            var info = {
+                "latitude": 0,
+                "longitude": 0
+            }
             if (check()){
                 var url = 'cgi-bin/get.cgi'
                 /*$.get(url, { address: $addr.val() }, function(data){
@@ -93,7 +121,7 @@ var cz_location = {
                         alert('Ops, server no response, please try later!');
                     }
                 });*/
-                var method = window.WebSocket? 'POST':'GET'
+                var method = $trace? 'POST':'GET';
                 $.ajax({
                     url: url,
                     data: { address: $addr.val(), method: method },
@@ -102,12 +130,45 @@ var cz_location = {
                     success: function(data){
                         if(data){
                             if(data.code){
-                                cz_location.msg('code: '+data.code);
-                                $("#cz_search").button('reset');
+                                if(data.code == 201){
+                                    var count = 0;
+                                    $("#bt_times").parent('div').hide();
+                                    function update_info(){
+                                        $.getJSON('cgi-bin/update.cgi', { address: $addr.val() }, function(data){
+                                            if(data){
+                                                var latitude = data.latitude;
+                                                var longitude = data.longitude;
+                                                if(latitude && longitude && (latitude!=info.latitude || longitude!=info.longitude)){
+                                                    cz_location.locate(cz_location.Gmap, latitude,longitude);
+                                                    var curr = { latitude:latitude, longitude:longitude }
+                                                    cz_location.line(info, curr);
+                                                    info.latitude = latitude;
+                                                    info.longitude = longitude;
+                                                }else{
+                                                    count++;
+                                                }
+                                            }else{
+                                                cz_location.msg('Oops, location info is lost!');
+                                                $("#cz_search").button('reset');
+                                                window.clearInterval(int);
+                                            }
+                                            if(count>=3000){
+                                                $("#cz_search").button('reset');
+                                                window.clearInterval(int);
+                                                cz_location.msg('Location info is not changed over 15 minutes, cancel request!');
+                                            }
+                                        });
+                                    }
+                                    update_info();
+                                    var int = setInterval(update_info, 3000);
+                                }else{
+                                    cz_location.msg(data.code + ' Not found');
+                                    $("#cz_search").button('reset');
+                                }
                             }else{
                                 var latitude = data.latitude;
                                 var longitude = data.longitude;
-                                cz_location.msg('latitude: '+latitude+', longitude: '+longitude);
+                                //cz_location.msg('latitude: '+latitude+', longitude: '+longitude);
                                 cz_location.locate(cz_location.Gmap, latitude,longitude);
                                 $("#cz_search").button('reset');
                             }

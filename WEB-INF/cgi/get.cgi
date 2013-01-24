@@ -4,54 +4,12 @@ __author__ = 'sanpingz'
 
 from xml.dom.minidom import parseString
 #import json
+import cgi, urllib, httplib, urllib2
+from common import *
 
-import cgi, urllib, httplib, urllib2, SocketServer
 print 'Content-type: application/json'
 #print 'Content-type: text/xml'
 print
-
-get_url = 'http://135.252.143.226:8080/ParlayREST/1.0/location/queries/location'
-post_url = 'http://135.252.143.226:8080/ParlayREST/1.0/location/subscriptions/periodic'
-post_http = ['135.252.143.226:8080', '/ParlayREST/1.0/location/subscriptions/periodic']
-post_xml = \
-'''<?xml version="1.0" encoding="UTF-8"?>
-<tl:periodicNotificationSubscription xmlns:tl="urn:oma:xml:rest:terminallocation:1">
-<clientCorrelator>%(clientCorrelator)s</clientCorrelator>
-<callbackReference>
-    <notifyURL>%(notifyURL)s</notifyURL>
-    <callbackData>%(callbackData)s</callbackData>
-</callbackReference>
-<address>%(address)s</address>
-<requestedAccuracy>%(requestedAccuracy)s</requestedAccuracy>
-<frequency>%(frequency)s</frequency>
-</tl:periodicNotificationSubscription>'''
-
-get_params = {
-    'acceptableAccuracy': 1000,
-    'maximumAge': 180,
-    'requestedAccuracy': 1000,
-    'responseTime': 300,
-    'tolerance': 'LowDelay'
-}
-
-post_params = {
-    'clientCorrelator': '0001',
-    #'notifyURL': 'http://135.252.143.60:8080/notifications/LocationNotification',
-    'notifyURL': 'http://135.252.143.60:8989',
-    'callbackData': '1234',
-    'requestedAccuracy': 10,
-    'frequency': 10
-}
-
-def json_dumps(d):
-    res = '{'
-    if d and isinstance(d,dict):
-        for key, val in d.items():
-            res += '"%s": %s,' % (key, val)
-        res = res[:-1]+'}'
-    else:
-        res = {}
-    return res
 
 def value(xml):
     dom = parseString(xml)
@@ -106,8 +64,8 @@ if addr:
 else:
     print ''
 
-if __name__ == '__main__':
-    d = {'latitude': u'300.0', 'longitude': u'3000.0'}
+if __name__ == '__main__': pass
+    #d = {'latitude': u'300.0', 'longitude': u'3000.0'}
     #print json_dumps(d)
-    print post(addr='sip:+16309792001@ims.lucentlab.com')
+    #print post(addr='sip:+16309792001@ims.lucentlab.com')
 
