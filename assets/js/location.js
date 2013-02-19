@@ -102,7 +102,6 @@ var cz_location = {
             return valid;
         }
         $search.click(function(){
-            $("#cz_search").button('loading');
             $("#msg_box").hide();
             var $trace = $("#cb_trace").attr('checked');
             var info = {
@@ -110,6 +109,7 @@ var cz_location = {
                 "longitude": 0
             }
             if (check()){
+                $("#cz_search").button('loading');
                 var url = 'cgi-bin/get.cgi'
                 /*$.get(url, { address: $addr.val() }, function(data){
                     alert(data);
@@ -134,10 +134,10 @@ var cz_location = {
                                     var count = 0;
                                     $("#bt_times").parent('div').hide();
                                     function update_info(){
-                                        $.getJSON('cgi-bin/update.cgi', { address: $addr.val() }, function(data){
-                                            if(data){
-                                                var latitude = data.latitude;
-                                                var longitude = data.longitude;
+                                        $.getJSON('cgi-bin/update.cgi', { address: $addr.val() }, function(jdata){
+                                            if(jdata){
+                                                var latitude = jdata.latitude;
+                                                var longitude = jdata.longitude;
                                                 if(latitude && longitude && (latitude!=info.latitude || longitude!=info.longitude)){
                                                     cz_location.locate(cz_location.Gmap, latitude,longitude);
                                                     var curr = { latitude:latitude, longitude:longitude }
@@ -155,14 +155,14 @@ var cz_location = {
                                             if(count>=3000){
                                                 $("#cz_search").button('reset');
                                                 window.clearInterval(int);
-                                                cz_location.msg('Location info is not changed over 15 minutes, cancel request!');
+                                                cz_location.msg('Location info is not changed over 15 minutes, request canceled!');
                                             }
                                         });
                                     }
                                     update_info();
                                     var int = setInterval(update_info, 3000);
                                 }else{
-                                    cz_location.msg(data.code + ' Not found');
+                                    cz_location.msg(data.code +' '+ data.msg);
                                     $("#cz_search").button('reset');
                                 }
                             }else{
@@ -173,12 +173,12 @@ var cz_location = {
                                 $("#cz_search").button('reset');
                             }
                         }else{
-                            cz_location.msg('Oops, server no response, please try later!');
+                            cz_location.msg('Oops, your number is not found, please try again!');
                             $("#cz_search").button('reset');
                         }
                     },
                     error: function(data){
-                        cz_location.msg('Oops, server is sleeping, or your number is not found, please try later!');
+                        cz_location.msg('Oops, server no response, please try later!');
                         $("#cz_search").button('reset');
                     }
                 });
@@ -263,5 +263,48 @@ var cz_location = {
         availHeight = parseInt(document.body.clientHeight);
         document.getElementById("map_canvas").style.width = availWidth+'px';
         document.getElementById("map_canvas").style.height = availHeight+'px';
+    }
+}
+
+cz_qos = {
+    init: function(){
+        var $pag = $(".pag_num"),
+            qosRank = 1,
+            $addr = $("#in_addr");
+        $("#bt_times").click(function(){
+            $(this).parent('div').hide();
+        });
+        $pag.click(function(){
+            $pag.removeClass('active');
+            $pag.addClass('disabled');
+            $(this).removeClass('disabled');
+            $(this).addClass('active');
+            qosRank = $(this).text();
+        });
+        function check(){
+            var sip = /sip(s?)\:[\w\.\-\+]+@([\w\-]+\.)+[a-zA-Z]/;
+            var tel = /^\+?\d{4,32}$/;
+            var valid = true;
+            if(!$addr.val()){
+                cz_location.msg('SIP URL or telephone number is required');
+                valid = false;
+            }else if(!sip.test($addr.val()) && !tel.test($addr.val())){
+                cz_location.msg('Input is invalid');
+                valid = false;
+            }
+            return valid;
+        }
+        $("#bt_send").click(function(){
+            $("#bt_times").parent('div').hide();
+            if(check()){
+                $.getJSON('cgi-bin/qos.cgi', { address: $addr.val(), qosRank: qosRank }, function(data){
+                    if(data){
+                        cz_location.msg(data.code+' '+data.msg);
+                    }else{
+                        cz_location.msg('Oops, server no response, please try later!');
+                    }
+                });
+            }
+        });
     }
 }

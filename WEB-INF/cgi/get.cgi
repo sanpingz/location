@@ -4,7 +4,7 @@ __author__ = 'sanpingz'
 
 from xml.dom.minidom import parseString
 #import json
-import cgi, urllib, httplib, urllib2
+import cgi, urllib, httplib, urllib2, shelve, time
 from common import *
 
 print 'Content-type: application/json'
@@ -31,15 +31,29 @@ def get(addr, url = get_url, params = get_params):
 
 def post(addr, url = post_url, params = post_params):
     params['address']=addr
+    db = shelve.open(DB_NAME)
+    try:
+        if db.has_key(addr) and (time.time()-db[addr]['time'])>7200:
+            del db[addr]
+    finally: db.close()
     headers = {"Content-type": "application/xml", "Accept": "application/xml"}
     data = post_xml % params
     req = urllib2.Request(url, data, headers)
-    res = 201
+    #code = 500
     try:
-        print urllib2.urlopen(req).read()
+        cb = urllib2.urlopen(req)
+        code = cb.code
+        #msg = cb.msg
     except urllib2.HTTPError, e:
-        res = e.code
-    return json_dumps(dict(code=res))
+        code = e.code
+        #msg = e.msg
+    res = dict(code=code)
+    if code!=201:
+        if str(code) in http_code.keys():
+            res['msg'] = http_code[str(code)]
+        else:
+            res['msg'] = 'Unexpected error'
+    return json_dumps(res)
 
 def http_post(addr, url = post_http, params = post_params):
     params['address']=addr

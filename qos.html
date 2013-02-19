@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8">
+    <title>QOS</title>
+    <!--<meta name="viewport" content="width=device-width, initial-scale=1.0">-->
+    <meta name="viewport" content="initial-scale=1.0, user-scalable=no" />
+    <meta name="description" content="">
+    <meta name="author" content="Calvin Zhang">
+
+    <!-- Le styles -->
+    <link href="assets/css/bootstrap.min.css" rel="stylesheet">
+    <style type="text/css">
+        body {
+            padding-top: 40px;
+            padding-bottom: 40px;
+            background-color: #f5f5f5;
+        }
+
+        .form-signin {
+            max-width: 300px;
+            padding: 19px 29px 29px;
+            margin: 0 auto 20px;
+            background-color: #fff;
+            border: 1px solid #e5e5e5;
+            -webkit-border-radius: 5px;
+            -moz-border-radius: 5px;
+            border-radius: 5px;
+            -webkit-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            -moz-box-shadow: 0 1px 2px rgba(0,0,0,.05);
+            box-shadow: 0 1px 2px rgba(0,0,0,.05);
+        }
+        .form-signin .form-signin-heading,
+        .form-signin input[type="text"] {
+            font-size: 16px;
+            height: auto;
+            margin-bottom: 15px;
+            padding: 7px 9px;
+        }
+        label { font-weight: 560; font-size: 16px; }
+
+      #msg_box { z-index: 10001; position: fixed; text-align: center; top: 40%; width: 95%; display:none; }
+      footer { margin-left: 10px; margin-top: 40px }
+    </style>
+    <link href="assets/css/bootstrap-responsive.min.css" rel="stylesheet">
+
+    <!--[if lt IE 9]>
+    <script src="http://html5shim.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+
+    <!-- Fav and touch icons -->
+    <link rel="shortcut icon" href="assets/img/favicon.ico">
+  </head>
+  <body>
+  <div class="container">
+
+      <form class="form-signin">
+          <h2 class="form-signin-heading" style="font-weight: 600; font-size: 30px; text-align: center; margin-bottom: 10px;">QOS</h2>
+          <label> Address
+          <input id="in_addr" type="text" class="input-block-level" placeholder="address">
+          </label>
+          <label>QosRank
+          <div class="pagination pagination-large" style="margin-top: 0">
+              <ul id="ul_pag">
+                  <li class="active pag_num"><a href="#">1</a></li>
+                  <li class="disabled pag_num"><a href="#">2</a></li>
+                  <li class="disabled pag_num"><a href="#">3</a></li>
+                  <li class="disabled pag_num"><a href="#">4</a></li>
+                  <li class="disabled pag_num"><a href="#">5</a></li>
+              </ul>
+          </div>
+          </label>
+          <button id="bt_send" class="btn btn-large" type="button" style="width: 120px">Send</button>
+      </form>
+
+  </div> <!-- /container -->
+
+    <div class="alert alert-info" id="msg_box">
+        <button type="button" class="close" id="bt_times">&times;</button>
+        <strong></strong>
+    </div>
+
+    <footer>
+        <p>&copy; Alcatel-Lucent 2012, <a href="mailto:sanping.zhang@alcatel-lucent.com">feedback</a></p>
+    </footer>
+
+    <script type="text/javascript" src="assets/js/jquery.js"></script>
+    <script type="text/javascript" src="assets/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="assets/js/location.js"></script>
+    <script type="text/javascript">
+        $(function(){
+            cz_qos.init();
+        });
+    </script>
+
+  </body>
+</html>

@@ -52,11 +52,33 @@ post_params = {
     'requestedAccuracy': 10,
     'frequency': 10
 }
+
+qos_url = 'http://135.252.143.226:8080/ParlayREST/1.0/qos/subscriptions/qos'
+qos_http = ['135.252.143.226:8080', '/ParlayREST/1.0/qos/subscriptions/qos']
+qos_xml = '''<?xml version="1.0" encoding="UTF-8"?>
+<cn:qosSubscription xmlns:cn="urn:oma:xml:rest:qos:1">
+   <address>%(address)s</address>
+   <qosRank>%(qosRank)s</qosRank>
+   <clientCorrelator>212345</clientCorrelator>
+</cn:qosSubscription>'''
+
+http_code = {
+    '400': 'Bad Request',
+    '403': 'Forbidden',
+    '404': 'Not Found',
+    '408': 'Request Timeout',
+    '480': 'Temporarily Unavailable',
+    '500': 'Internal Server Error'
+}
+
 def json_dumps(d):
     res = '{'
     if d and isinstance(d,dict):
         for key, val in d.items():
-            res += '"%s": %s,' % (key, val)
+            if str(val).isdigit():
+                res += '"%s": %s,' % (key, val)
+            else:
+                res += '"%s": "%s",' % (key, val)
         res = res[:-1]+'}'
     else:
         res = {}

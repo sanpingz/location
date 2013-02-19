@@ -4,7 +4,7 @@ __author__ = 'sanpingz'
 
 import sys
 from xml.dom.minidom import parseString
-import shelve
+import shelve, time
 from common import *
 
 def value(xml):
@@ -24,6 +24,7 @@ if xml and info:
     db = shelve.open(DB_NAME)
     addr = str(info['address'])
     del info['address']
+    info['time'] = time.time()
     db[addr] = info
     db.close()
 
