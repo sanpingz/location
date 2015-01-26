@@ -1,1 +1,4 @@
-display location info on google map, update info using polling way
+location
+====
+
+display location info on google map, update info by polling
